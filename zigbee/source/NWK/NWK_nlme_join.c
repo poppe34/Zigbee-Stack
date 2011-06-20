@@ -10,6 +10,7 @@
 #include "MAC/mac_prototypes.h"
 #include "MAC/MAC_mlme.h"
 #include "MAC/MAC_mcps.h"
+#include "NWK/NWK_command.h"
 
 nwk_join_t *join;
 typedef void (*nwk_joinHandler_t)(nwk_status_t status);
