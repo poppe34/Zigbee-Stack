@@ -9,12 +9,15 @@
 #ifndef MAC_MLME_SCAN_H_
 #define MAC_MLME_SCAN_H_
 
+#include "list.h"
+
 #include "MISC/security.h"
 
 #include "MAC/mac.h"
 
 typedef enum
 {
+	nwk_networkFormation = 0x01,
 	nlme_ED_Scan = 0x04,
 }scan_request_t;
 
@@ -35,10 +38,9 @@ typedef struct MAC_SCAN{
 }mac_scan_t;
 
 typedef struct MAC_SCAN_CONFIRM{
-	mac_pan_descriptor_t 	*desc;
+	list_t					*descList;
 	scan_type_t 			type;
 	mac_status_t			status;
-	uint8_t					count;
 }mac_scanResult_t;
 
 void MAC_mlme_scanSetCb(voidPtr cb);

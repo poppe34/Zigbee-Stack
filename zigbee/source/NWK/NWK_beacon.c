@@ -26,7 +26,7 @@ void NWK_beaconInd(mac_pan_descriptor_t *desc, mpdu_t *mpdu, frame_t *fr){
 //1st byte Protocol ID
 	beacon.protocolID = *fr->Rx_fr->ptr++;
 
-//2nd byte Stack profile and protocol verison
+//2nd byte Stack profile and protocol version
 	beacon.stackProf = (*fr->Rx_fr->ptr & 0x0f);
 	beacon.protocolVer = ((*fr->Rx_fr->ptr >> 4) & 0x0f);
 	fr->Rx_fr->ptr++;
@@ -70,7 +70,7 @@ void NWK_beaconInd(mac_pan_descriptor_t *desc, mpdu_t *mpdu, frame_t *fr){
 		}
 
 		tbl->potentialParent = YES;
-		tbl->logicalChannel = ppib->phyCurrentChannel;
+		tbl->logicalChannel = desc->LogicalChannel;
 		tbl->depth = beacon.devDepth;
 		tbl->beaconOrder = 0; //desc->SuperframeSpec.beaconOrder;
 		tbl->permitJoining = 0; //beacon. desc->SuperframeSpec.assocPermit;

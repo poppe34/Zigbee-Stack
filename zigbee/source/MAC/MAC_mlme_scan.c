@@ -17,7 +17,7 @@
 
 void MAC_mlme_scanConfim(void);
 
-mac_pan_descriptor_t PANs_table[20]; //TODO: make this a variable called panTableMAX or something like that. Also i might make this a linked list
+
 uint8_t pointer = 0x00;
 mac_scan_t *current_scan;
 phy_pib_t *ppib;
@@ -58,7 +58,7 @@ void MAC_mlme_scanReq(mac_scan_t *scan){
 			old_PANid = mpib->macPANid;
 
 			MAC_setPANid(0xffff);
-			status = MAC_SCAN_IN_PROGRESS;
+			mpib->macRuntimeStatus = MAC_SCAN_IN_PROGRESS;
 			MAC_activeScan(scan);
 
 	break;
@@ -74,7 +74,17 @@ void MAC_mlme_scanReq(mac_scan_t *scan){
 
 
 }
-
+void MAC_mlme_edScan(mac_scan_t *scan)
+{
+	for(uint8_t x=0; x<24; x++)
+	{
+		if(((scan->ScanChannels) >> x) & 0x00000001)
+		{
+			
+		}
+		
+	}		
+}
 void MAC_activeScan(mac_scan_t *scan){
 //	TODO: 	This is a big one... the timeing on this is way off I need to figure out the wait then i need to add it to the que and create a function
 //			to return to to continue my  scan
@@ -102,28 +112,8 @@ void end_active_scan(void)
 	free(channels);
 	MAC_mlme_scanConfirm();
 }
-mac_pan_descriptor_t *get_PAN_Table(uint8_t pos){
-	return &PANs_table[pos];
-}
 
-//	TODO:	Alot needs to be added this function right now i am not sure on what.
-void add_to_PAN_Table(mac_pan_descriptor_t *desc){
-	PANs_table[pointer] = *desc;
-	pointer++;
 
-#ifdef debug
-	if (pointer > 20){
-	alarm("PAN TABLE FULL");
-	}
-#endif
-
-}//end add_to_PAN_table
-uint8_t MAC_getPanTableCount(void){
-	return pointer;
-}
-void new_PAN_Table(void){
-	pointer = 0;
-}
 
 void MAC_nextBeacon_cb(uint32_t *channels)
 {
@@ -187,15 +177,17 @@ void MAC_mlme_scanSetDefaultCb(void)
 }
 void MAC_mlme_scanConfirm(void)
 {
-	mac_scanResult_t *result = (mac_scanResult_t *)malloc(sizeof(mac_scanResult_t));
-	result->count 	= MAC_getPanTableCount();
-	result->desc 	= get_PAN_Table(0);
+	list_t *scanResult = MAC_pandDescriptor_getList();
+	
+	mac_scanResult_t result;
+
+	result->desc 	= scanResult;
 	result->status 	= status;
 	result->type	= type;
-    if(scanHandler)
-	    (scanHandler)(result);
-	else
-	    alarm("No Scan Handler was implemented");
+
+
+	(scanHandler)(&result);
+	
 }
 
 

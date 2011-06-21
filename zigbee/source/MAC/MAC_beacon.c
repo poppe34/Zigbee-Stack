@@ -6,21 +6,33 @@
  */
 
 #include <frame.h>
+#include "alarms_task.h"
+
 #include "MAC/mac.h"
 #include "MAC/mac_prototypes.h"
+#include "MAC/MAC_beacon.h"
 #include "NWK/NWK_prototypes.h"
 #include "MAC/MAC_command.h"
 #include "MAC/MAC_mlme.h"
 
-typedef void(*mac_beaconHandler_t)(mac_status_t status);
+LIST(panDescriptor);
+
+
 mac_beaconHandler_t handle;
 
 void MAC_beaconReq(void *cb)
 {
 	handle = (mac_beaconHandler_t *)cb;
-    
-	
-    
+}
+
+void MAC_panDescriptor_init(void)
+{
+	list_init(panDescriptor);
+}
+
+list_t * MAC_pandDescriptor_getList(void)
+{
+	return panDescriptor;
 }
 
 void MAC_beaconHandler(mpdu_t *mpdu, frame_t *fr)
@@ -41,46 +53,43 @@ void MAC_beaconHandler(mpdu_t *mpdu, frame_t *fr)
 	mac_gtsSpec_t gtsSpec;
 	
 	sf = *((mac_superframe_t *)fr->Rx_fr->ptr);
-	fr->Rx_fr->ptr += 2;
+	fr->Rx_fr->ptr += sizeof(mac_superframe_t);
 	
-	tempgtsSpec = *((mac_gtsSpec_t *)fr->Rx_fr->ptr);
-	fr->ptr++;
+	gtsSpec = *((mac_gtsSpec_t *)fr->Rx_fr->ptr);
+	fr->Rx_fr->ptr += sizeof(mac_gtsSpec_t);
+
+
+	
+	mac_pan_descriptor_t *desc = (mac_pan_descriptor_t *)malloc(sizeof(mac_pan_descriptor_t));
+	desc->Coord = mpdu->source;
+
+	desc->LogicalChannel = ppib->phyCurrentChannel;
+	desc->ChannelPage = ppib->phyCurrentPage;
+
+	desc->GTSPermit = false; //TODO: I need to fix this I am not sure on it.
+	desc->LinkQuality = fr->LQI;
+	desc->Timestamp = fr->timestamp;
+	desc->SecurityFailure = 0x00;//TODO: Proper data needs to be inserted.
+	desc->SecurityLevel = MAC_sec_none;// TODO: Proper data needs to be inserted.
+	desc->KeyIdMode = 0x00;// TODO: Proper data needs to be inserted.
+	desc->KeySource = 0x00;// TODO: Proper data needs to be inserted.
+	desc->KeyIndex = 0x00;// TODO: Proper data needs to be inserted.
+	
 
 	if(mpib->macRuntimeStatus == MAC_SCAN_IN_PROGRESS)
 	{
-		
-		mac_pan_descriptor_t *desc = (mac_pan_descriptor_t *)malloc(sizeof(mac_pan_descriptor_t));
-		desc->Coord = mpdu->source;
-
-		desc->LogicalChannel = ppib->phyCurrentChannel;
-		desc->ChannelPage = ppib->phyCurrentPage;
-
-		desc->GTSPermit = false; //TODO: I need to fix this I am not sure on it.
-		desc->LinkQuality = fr->LQI;
-		desc->Timestamp = fr->timestamp;
-		desc->SecurityFailure = 0x00;//TODO: Proper data needs to be inserted.
-		desc->SecurityLevel = MAC_sec_none;// TODO: Proper data needs to be inserted.
-		desc->KeyIdMode = 0x00;// TODO: Proper data needs to be inserted.
-		desc->KeySource = 0x00;// TODO: Proper data needs to be inserted.
-		desc->KeyIndex = 0x00;// TODO: Proper data needs to be inserted.
-	
-
-
-		desc->SuperframeSpec.assocPermit = ((uint8_t)(tempsuperframe>>MAC_SUPERFRAME_ASSOC_PERMIT_SHIFT & 0x01));
-		desc->SuperframeSpec.battLifeExt =  ((uint8_t)(tempsuperframe>>MAC_SUPERFRAME_BATT_EX_SHIFT & 0x01));
-		desc->SuperframeSpec.beaconOrder = ((uint8_t)(tempsuperframe>> MAC_SUPERFRAME_BEACON_ORDER_SHIFT & 0x0f));
-		desc->SuperframeSpec.capSlot = ((uint8_t)(tempsuperframe>>MAC_SUPERFRAME_CAP_SLOT_SHIFT & 0x0f));
-		desc->SuperframeSpec.panCoord = ((uint8_t)(tempsuperframe>>MAC_SUPERFRAME_PAN_COORD_SHIFT & 0x01));
-		desc->SuperframeSpec.superframeOrder = ((uint8_t)(tempsuperframe>>MAC_SUPERFRAME_FRAME_ORDER_SHIFT & 0x0f));
-
-	//add_to_PAN_Table(desc);
-
+		list_add(panDescriptor, desc);
+		alarm_new(9, "Count of Descriptor table is %i", list_length(panDescriptor));
 	}	
+		
 	MAC_mlme_beaconInd(mpdu, fr);
 	
 	NWK_beaconInd(desc, mpdu, fr);
 
-
+	if(mpib->macRuntimeStatus != MAC_SCAN_IN_PROGRESS)
+	{
+		free(desc);
+	}
 //	TODO: 	I want to add a que for the different coordinator PAN_IDs that will allow me to select a different PANid
 //			Or just to see what else is out there.
 
