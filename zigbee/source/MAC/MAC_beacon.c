@@ -30,42 +30,52 @@ void MAC_beaconHandler(mpdu_t *mpdu, frame_t *fr)
  */
     
     /*TODO: I need to setup a data request if I get a beacon with this address as the dest. addr */
-    /*
+   
+   
+   // TODO: I need to add a Mac status with scan mode so I capture all the desc. tables only durring scans
 	uint8_t len;
 	phy_pib_t *ppib = get_phyPIB();
-	uint16_t tempsuperframe, tempgtsSpec;
+	mac_pib_t *mpib = get_macPIB();
+	
+	mac_superframe_t sf;
+	mac_gtsSpec_t gtsSpec;
+	
+	sf = *((mac_superframe_t *)fr->Rx_fr->ptr);
+	fr->Rx_fr->ptr += 2;
+	
+	tempgtsSpec = *((mac_gtsSpec_t *)fr->Rx_fr->ptr);
+	fr->ptr++;
 
-	mac_pan_descriptor_t *desc = (mac_pan_descriptor_t *)malloc(sizeof(mac_pan_descriptor_t));
-	desc->Coord = mpdu->source;
+	if(mpib->macRuntimeStatus == MAC_SCAN_IN_PROGRESS)
+	{
+		
+		mac_pan_descriptor_t *desc = (mac_pan_descriptor_t *)malloc(sizeof(mac_pan_descriptor_t));
+		desc->Coord = mpdu->source;
 
-	desc->LogicalChannel = ppib->phyCurrentChannel;
-	desc->ChannelPage = ppib->phyCurrentPage;
+		desc->LogicalChannel = ppib->phyCurrentChannel;
+		desc->ChannelPage = ppib->phyCurrentPage;
 
-	desc->GTSPermit = false; //TODO: I need to fix this I am not sure on it.
-	desc->LinkQuality = fr->LQI;
-	desc->Timestamp = fr->timestamp;
-	desc->SecurityFailure = 0x00;//TODO: Proper data needs to be inserted.
-	desc->SecurityLevel = MAC_sec_none;// TODO: Proper data needs to be inserted.
-	desc->KeyIdMode = 0x00;// TODO: Proper data needs to be inserted.
-	desc->KeySource = 0x00;// TODO: Proper data needs to be inserted.
-	desc->KeyIndex = 0x00;// TODO: Proper data needs to be inserted.
+		desc->GTSPermit = false; //TODO: I need to fix this I am not sure on it.
+		desc->LinkQuality = fr->LQI;
+		desc->Timestamp = fr->timestamp;
+		desc->SecurityFailure = 0x00;//TODO: Proper data needs to be inserted.
+		desc->SecurityLevel = MAC_sec_none;// TODO: Proper data needs to be inserted.
+		desc->KeyIdMode = 0x00;// TODO: Proper data needs to be inserted.
+		desc->KeySource = 0x00;// TODO: Proper data needs to be inserted.
+		desc->KeyIndex = 0x00;// TODO: Proper data needs to be inserted.
+	
+
+
+		desc->SuperframeSpec.assocPermit = ((uint8_t)(tempsuperframe>>MAC_SUPERFRAME_ASSOC_PERMIT_SHIFT & 0x01));
+		desc->SuperframeSpec.battLifeExt =  ((uint8_t)(tempsuperframe>>MAC_SUPERFRAME_BATT_EX_SHIFT & 0x01));
+		desc->SuperframeSpec.beaconOrder = ((uint8_t)(tempsuperframe>> MAC_SUPERFRAME_BEACON_ORDER_SHIFT & 0x0f));
+		desc->SuperframeSpec.capSlot = ((uint8_t)(tempsuperframe>>MAC_SUPERFRAME_CAP_SLOT_SHIFT & 0x0f));
+		desc->SuperframeSpec.panCoord = ((uint8_t)(tempsuperframe>>MAC_SUPERFRAME_PAN_COORD_SHIFT & 0x01));
+		desc->SuperframeSpec.superframeOrder = ((uint8_t)(tempsuperframe>>MAC_SUPERFRAME_FRAME_ORDER_SHIFT & 0x0f));
+
 	//add_to_PAN_Table(desc);
 
-	tempgtsSpec = (uint16_t)*fr->ptr++;
-	tempgtsSpec |= ((uint16_t)(*fr->ptr >> 8));
-	fr->ptr++;
-
-	tempsuperframe = (uint16_t)*fr->ptr++;
-	tempsuperframe |= ((uint16_t)(*fr->ptr >> 8));
-	fr->ptr++;
-
-	desc->SuperframeSpec.assocPermit = ((uint8_t)(tempsuperframe>>MAC_SUPERFRAME_ASSOC_PERMIT_SHIFT & 0x01));
-	desc->SuperframeSpec.battLifeExt =  ((uint8_t)(tempsuperframe>>MAC_SUPERFRAME_BATT_EX_SHIFT & 0x01));
-	desc->SuperframeSpec.beaconOrder = ((uint8_t)(tempsuperframe>> MAC_SUPERFRAME_BEACON_ORDER_SHIFT & 0x0f));
-	desc->SuperframeSpec.capSlot = ((uint8_t)(tempsuperframe>>MAC_SUPERFRAME_CAP_SLOT_SHIFT & 0x0f));
-	desc->SuperframeSpec.panCoord = ((uint8_t)(tempsuperframe>>MAC_SUPERFRAME_PAN_COORD_SHIFT & 0x01));
-	desc->SuperframeSpec.superframeOrder = ((uint8_t)(tempsuperframe>>MAC_SUPERFRAME_FRAME_ORDER_SHIFT & 0x0f));
-
+	}	
 	MAC_mlme_beaconInd(mpdu, fr);
 	
 	NWK_beaconInd(desc, mpdu, fr);
@@ -73,7 +83,7 @@ void MAC_beaconHandler(mpdu_t *mpdu, frame_t *fr)
 
 //	TODO: 	I want to add a que for the different coordinator PAN_IDs that will allow me to select a different PANid
 //			Or just to see what else is out there.
-*/
+
 }//end incoming_beacon_handler
 
 void MAC_beacon(void)

@@ -325,43 +325,50 @@ typedef struct MSDU{
 	uint8_t data[128];
 }msdu_t;
 
+
 typedef struct MAC_PIB{
-	uint32_t	macAckWaitDuration;
-	bool		macAssociatedPANCoord;
-	bool		macAssociationPermit;
-	bool 		macAutoRequest;
-	bool		macBattLifeExt;
-	uint8_t 	macBattLifeExtPeriods;
-	uint8_t		*macBeaconPayload;
-	uint8_t		macBeaconPayloadLength;
-	uint8_t		macBeaconOrder;
-	uint32_t	macBeaconTxTime;
-	uint8_t		macBSN;
-	addr_t		macCoordExtendedAddress;
-	addr_t		macCoordShortAddress;
-	uint8_t		macDSN;
-	bool		macGTSPermit;
-	uint8_t		macMaxBE;
-	uint8_t		macMaxCSMABackoffs;
-	uint8_t		macMaxFrameTotalWaitTime;
-	uint8_t		macMaxFrameRetries;
-	uint8_t		macMinBE;
-	uint8_t		macMinLIFSPeriod;
-	uint8_t		macMinSIFSPeriod;
-	uint16_t	macPANid;
-	bool		macPromiscuousMode;
-	uint32_t	macResponseWaitTime;
-	bool		macRxOnWhenIdle;
-	bool		macSecurityEnabled;
-	addr_t		macShortAddress;
-	addr_t		macLongAddress;
-	uint8_t		macSupeframeOrder;
-	uint16_t	macSyncSymbolOffset;
-	bool		macTimestampSupported;
-	uint16_t	macTransactionPersistenceTime;
+	uint32_t		macAckWaitDuration;
+	bool			macAssociatedPANCoord;
+	bool			macAssociationPermit;
+	bool 			macAutoRequest;
+	bool			macBattLifeExt;
+	uint8_t 		macBattLifeExtPeriods;
+	uint8_t			*macBeaconPayload;
+	uint8_t			macBeaconPayloadLength;
+	uint8_t			macBeaconOrder;
+	uint32_t		macBeaconTxTime;
+	uint8_t			macBSN;
+	addr_t			macCoordExtendedAddress;
+	addr_t			macCoordShortAddress;
+	uint8_t			macDSN;
+	bool			macGTSPermit;
+	uint8_t			macMaxBE;
+	uint8_t			macMaxCSMABackoffs;
+	uint8_t			macMaxFrameTotalWaitTime;
+	uint8_t			macMaxFrameRetries;
+	uint8_t			macMinBE;
+	uint8_t			macMinLIFSPeriod;
+	uint8_t			macMinSIFSPeriod;
+	uint16_t		macPANid;
+	bool			macPromiscuousMode;
+	uint32_t		macResponseWaitTime;
+	bool			macRxOnWhenIdle;
+	bool			macSecurityEnabled;
+	addr_t			macShortAddress;
+	addr_t			macLongAddress;
+	uint8_t			macSupeframeOrder;
+	uint16_t		macSyncSymbolOffset;
+	bool			macTimestampSupported;
+	uint16_t		macTransactionPersistenceTime;
+	mac_status_t	macRuntimeStatus;
 }mac_pib_t;
 
-
+typedef struct {
+	COMBINE(3, (
+	uint8_t mac_GTS_Descriptor:3,
+	uint8_t mac_resv:4,
+	uint8_t mac_GTS_permit:1))
+}mac_gtsSpec_t;
 
 typedef struct MAC_SUPERFRAME{
 	uint8_t		superframeOrder;
@@ -387,7 +394,7 @@ typedef struct PAN_DESCRIPTOR{
 	uint8_t		 		KeyIndex;
 }mac_pan_descriptor_t;
 
-typedef struct MAC_BEACON{
+typedef struct {
 	uint8_t					BSN;
 	mac_pan_descriptor_t	pan_desc;
 	uint8_t					pend_addr;//TODO: look into what to do with this... I am not sure i want to leave it an uint8

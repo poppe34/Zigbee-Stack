@@ -117,6 +117,8 @@ mac_status_t mac_init(void) {
     macPIB.macTimestampSupported = true;
     macPIB.macTransactionPersistenceTime = 0x01f4;
 
+	macPIB.macRuntimeStatus = MAC_SUCCESS;
+	
     MAC_setCurrentChannel(DEFAULT_CHANNEL);
 
 //	TODO:	the following arguments need to be moved to a better location.

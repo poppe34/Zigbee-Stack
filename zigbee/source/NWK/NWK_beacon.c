@@ -16,7 +16,8 @@ uint64_t filterPANid;
 
 void NWK_beaconInd(mac_pan_descriptor_t *desc, mpdu_t *mpdu, frame_t *fr){
 	uint8_t x;
-
+	
+	phy_pib_t *ppib = get_phyPIB();
 
 	nwk_neigh_t *tbl = (nwk_neigh_t *)malloc(sizeof(nwk_neigh_t));
 	nwk_discript_t *disc = (nwk_discript_t *)malloc(sizeof(nwk_discript_t));
@@ -53,14 +54,14 @@ void NWK_beaconInd(mac_pan_descriptor_t *desc, mpdu_t *mpdu, frame_t *fr){
 //****************************************************************************
 	tbl->extendPANid = beacon.extendedPANid;
 	if(!filterExtPANidActive || (filterExtPANidActive && (tbl->extendPANid == filterPANid))){
-		tbl->LQI = desc->LinkQuality;
+		tbl->LQI = fr->LQI;
 //		tbl.RxOnWhenIdle = desc.
-//		tbl.age
+		tbl.age = 0;
 //		tbl.beaconOffset; this optional.
-		tbl->beaconTime = desc->Timestamp;
+		tbl->beaconTime = fr->timestamp;
 //		tbl->cost; if nwkSymLink is true then this is neccessary but I am not there yet.
 //		tbl->failure;
-//		led_on_byte(mpdu->source.mode);
+
 		if(desc->Coord.mode == SHORT_ADDRESS){
 			tbl->shortAddr = desc->Coord;
 		}
@@ -69,10 +70,10 @@ void NWK_beaconInd(mac_pan_descriptor_t *desc, mpdu_t *mpdu, frame_t *fr){
 		}
 
 		tbl->potentialParent = YES;
-		tbl->logicalChannel = desc->LogicalChannel;
+		tbl->logicalChannel = ppib->phyCurrentChannel;
 		tbl->depth = beacon.devDepth;
-		tbl->beaconOrder = desc->SuperframeSpec.beaconOrder;
-		tbl->permitJoining = desc->SuperframeSpec.assocPermit;
+		tbl->beaconOrder = 0; //desc->SuperframeSpec.beaconOrder;
+		tbl->permitJoining = 0; //beacon. desc->SuperframeSpec.assocPermit;
 		tbl->potentialParent = 0x01;
 		tbl->type = ((desc->SuperframeSpec.panCoord == 1)? 0x00: 0x01);
 
