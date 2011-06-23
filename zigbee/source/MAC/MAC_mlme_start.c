@@ -5,31 +5,71 @@
  *      Author: mpoppe
  */
 #include <frame.h>
+#include "alarms_task.h"
 
 #include "conf_zigbee.h"
 
-#include <MAC/mac_prototypes.h>
 #include "PHY/rc_rf230.h"
 
-mac_status_t MAC_mlme_startReq(void){
+#include "MAC/mac.h"
+#include "MAC/MAC_mlme_start.h"
+
+
+
+MAC_mlme_start_CB_t startCBhandler;
+
+void MAC_mlme_startReq(mac_mlme_start_t *start)
+{
 	mac_pib_t *mpib = get_macPIB();
 	phy_pib_t *ppib = get_phyPIB();
 
-	uint16_t pan = DEFAULT_PANID;
-	uint16_t addr =0x0000;
-//Set the PANid
+	if(mpib->macShortAddress.shortAddr == 0xffff)
+	{
+		MAC_mlme_startConf(MAC_NO_SHORT_ADDRESS);
+	}
+	mpib->macBeaconOrder = start->beaconOrder;
+	mpib->macSupeframeOrder = start->superFrameOrder;
+	
+	// Don't have the Channel Page in the pib.
+	//mpib->macChannelPage = start->channelPage;
 
-	MAC_setPANid(pan);
+	//Set the PANid
+	MAC_setPANid(start->PANid);
+
+	if(start->beaconOrder < 0x0f)
+	{
+		mpib->macBattLifeExt = start->batteryLifeExt;
+		mpib->macBeaconTxTime = start->startTime;
+	}		
+	//tell transceiver that we are the coord.
+	I_AM_COORD(start->PANcoord);
+
+	//Set the current Channel
+	MAC_setCurrentChannel(start->channel);
+
+	MAC_mlme_startConf(MAC_SUCCESS);
+}
 
 
-//Set the short address to the default Coor addr
-	MAC_setShortAddr(addr);
+void MAC_mlme_startConf(mac_status_t status)
+{
+	if(startCBhandler)
+	{	
+		(startCBhandler)(status);
+	}
+	else
+	{
+		alarm("Recieved MAC start Confirm without seting the CB");
+	}		
+	
+}
 
-//tell transeiver that we are the coord.
+void MAC_mlme_start_setCB(voidPtr cb)
+{
+	startCBhandler = (MAC_mlme_start_CB_t *)cb;
+}
 
-	I_AM_COORD(YES);
-//Set the current Channel
-	MAC_setCurrentChannel(DEFAULT_CHANNEL);
-
-	return MAC_SUCCESS;
+void MAC_mlme_start_setDefaultCB(void)
+{
+	startCBhandler = NULL;
 }

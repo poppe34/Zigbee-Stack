@@ -380,6 +380,7 @@ typedef struct MAC_SUPERFRAME{
 }mac_superframe_t;
 
 typedef struct PAN_DESCRIPTOR{
+	void				*next;
 	addr_t				Coord;
 	uint8_t				LogicalChannel;
 	uint8_t				ChannelPage;
@@ -432,5 +433,26 @@ typedef void (*trx_cb_t)(phy_trac_t);
 /*================================= PROTOTYPES       =========================*/
 void MAC_setPanCoord(Bool coord);
 Bool MAC_isPanCoord(void);
+mac_status_t mac_init(void);
+uint16_t get_short_ADDR(void);
+void get_PAN_ID(uint8_t *id);
+uint64_t get_IEEE_ADDR(void);
+void set_IEEE_ADDR(uint64_t addr);
+uint8_t get_seqNum(void);
+Bool MAC_isAssoc(void);
+void MAC_setAssoc(Bool value);
+mac_pib_t *get_macPIB(void);
+void MAC_setCurrentChannel(uint8_t chan);
+mac_status_t mac_init(void);
+uint8_t get_MAC_seqNum(void);
+mac_pib_t *get_macPIB(void);
+void MAC_setPANid(uint16_t pan);
+void MAC_setShortAddr(uint16_t addr);
+void MAC_setCurrentChannel(uint8_t chan);
+void MAC_setLongAddr(uint64_t addr);
+void MAC_setCoordPANid(uint16_t pan);
+void MAC_setCoordShortAddr(uint16_t addr);
+void MAC_setCoordLongAddr(uint64_t addr);
+
 #endif
 /* EOF */

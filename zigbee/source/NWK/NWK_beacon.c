@@ -14,7 +14,7 @@ uint64_t filterPANid;
 
 
 
-void NWK_beaconInd(mac_pan_descriptor_t *desc, mpdu_t *mpdu, frame_t *fr){
+void NWK_beacon_handler(mac_pan_descriptor_t *desc, mpdu_t *mpdu, frame_t *fr){
 	uint8_t x;
 	
 	phy_pib_t *ppib = get_phyPIB();
@@ -56,7 +56,7 @@ void NWK_beaconInd(mac_pan_descriptor_t *desc, mpdu_t *mpdu, frame_t *fr){
 	if(!filterExtPANidActive || (filterExtPANidActive && (tbl->extendPANid == filterPANid))){
 		tbl->LQI = fr->LQI;
 //		tbl.RxOnWhenIdle = desc.
-		tbl.age = 0;
+		tbl->age = 0;
 //		tbl.beaconOffset; this optional.
 		tbl->beaconTime = fr->timestamp;
 //		tbl->cost; if nwkSymLink is true then this is neccessary but I am not there yet.

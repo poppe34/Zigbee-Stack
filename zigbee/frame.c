@@ -45,7 +45,8 @@ void frame_init(void)
 frame_t *frame_new(void)
 {
     frame_t *fr;
-    
+
+	
     if(list_length(frames)<kFRAME_POOL_SIZE)
     {
         fr = (frame_t *)malloc(sizeof(frame_t));
@@ -53,6 +54,12 @@ frame_t *frame_new(void)
     else
         alarm("Exceded the max number of frames");
     
+	fr->mac = NULL;
+	fr->aps = NULL;
+	fr->nwk = NULL;
+	fr->payload = NULL;
+	fr->Rx_fr = NULL;
+	
 	return fr;
 }
 

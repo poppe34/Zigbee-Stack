@@ -43,7 +43,7 @@ void nwk_addNetworkDiscription(nwk_discript_t *disc);
 
 //NWK_nlme_join
 void NWK_nlme_joinNetDiscov_cb(nwk_netDisc_t *netDisc);
-void NWK_nlme_joinReq(nwk_join_t *join, void *cb);
+
 void NWK_nlme_joinMacAssoc_cb(mac_status_t status);
 void NWK_nlme_joinTx_cb(uint8_t num);
 void NWK_nlme_joinConfirm(nwk_status_t status);
@@ -60,8 +60,7 @@ nwk_status_t NWK_status_cmd(nwk_status_code_t code, uint16_t addr);
 mac_status_t NWKtoMAC_bridge(mac_fcf_t *fcf, npdu_t *npdu, frame_t *fr);
 
 //NWK_beacon.c
-void NWK_beaconFilterControl(uint64_t PANid);
-void NWK_beaconInd(mac_pan_descriptor_t *desc, mpdu_t *mpdu, frame_t *fr);
+
 
 //NWK_NLME_netForm
 nwk_status_t NWK_formNetwork(void);

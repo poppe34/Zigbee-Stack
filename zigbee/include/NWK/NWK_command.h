@@ -109,6 +109,6 @@ void NWK_cmd_leave(nwk_leaveCmdOptionField_t leave);
 void NWK_cmd_routeRec(short_addr_t addr);
 void NWK_cmd_rejoinReq(void);
 void NWK_cmd_rejoinResp(short_addr_t addr, uint8_t status);
-void NWK_cmd_linkStatus(void);
+void NWK_cmd_linkStatus(payload_t *pl);
 
 #endif /* NWK_COMMAND_H_ */

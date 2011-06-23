@@ -432,7 +432,7 @@ void MAC_commandHandler(frame_t *fr, mpdu_t *mpdu)
 		break;
 		
 		case MAC_DATA_REQUEST:
-			alarm("Rx a Data command");
+			alarm("Rx a Data Request command");
 		break;
 		
 		case MAC_PAN_CONFLICT_NOTIFY:

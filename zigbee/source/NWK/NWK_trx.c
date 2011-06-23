@@ -12,6 +12,7 @@
 
 #include <NWK/NWK_prototypes.h>
 #include "NWK/NWK_nlde.h"
+#include "NWK/NWK_command.h"
 
 #include "MAC/MAC_prototypes.h"
 
@@ -208,4 +209,7 @@ void NWK_setTxCB(trx_cb_t *tb){
 void NWK_txStatus(phy_trac_t trac){
 	(trx_cb)(trac);
 }
+
+
+
 /*EOF*/

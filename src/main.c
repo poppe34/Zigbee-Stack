@@ -19,13 +19,20 @@
 #include "zigbee.h"
 #include "zigbee_task.h"
 #include "spi_task.h"
-#include "NWK/NWK_prototypes.h"
-#include "NWK/NWK_command.h"
+
+#include "RF230/RF230.h"
+
 #include "MAC/mac_prototypes.h"
 #include "MAC/MAC_mlme.h"
 #include "MAC/MAC_command.h"
 
-#include "RF230/RF230.h"
+
+#include "NWK/NWK_prototypes.h"
+#include "NWK/NWK_command.h"
+#include "NWK/NWK_neighborTable.h"
+#include "NWK/NWK_nlme.h"
+#include "NWK/NWK_nlde.h"
+
 
 void debug_test(void);
 
@@ -65,31 +72,20 @@ int main(void)
 	
 	security_t sec;
 
-//	MAC_beaconReqCommand();//LOOKS GOOD
-//	if((MAC_isPanCoord()) == 0)
+	
+
+if(ioport_pin_is_high(ZIGBEE_COORD_GPIO))
 	{
-		
-	nwk_leaveCmdOptionField_t temp;
-	temp.removeChild = YES;
-	
-	NWK_cmd_linkStatus();
-	
-/*	_delay_ms(500);
-	MAC_mlme_assocReq(&destShortTemp, 0x00000000, 11, 0x8e, &sec);
+		nwk_nlme_nf_t nf;
+		nf.beaconOrder = 0xf;
+		nf.BatteryLifeExt = NO;
+		nf.scanChannels = 0x00000800;
+		nf.scanDuration = 0x2;
+		nf.superframeOrder = 0xf;
+		NWK_nlme_formNetworkReq(&nf);
 
-
-	_delay_ms(5000);
-	mac_mlme_disassocReq(DEV_WISHES_TO_LEAVE);
-	*/
 	}	
-//	MAC_assocRequestCommand(&destShortTemp);//LOOKS GOOD
-//	MAC_assocResponceCommand(mlme_assoc_t *assoc);
-//	MAC_disassocCommand(&destShortTemp);//LOOKS GOOD
-//	MAC_dataRequestCommand(&destShortTemp);//LOOKS GOOD
-//	MAC_panIDConflictCommand();//LOOKS GOOD
-//	MAC_orphanCommand();//LOOKS GOOD
-//	MAC_beaconReqCommand();
-//	MAC_commandCoordRealign(&destShortTemp, &sec);
+
 
 	scheduler();
 	

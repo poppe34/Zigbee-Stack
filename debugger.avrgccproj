@@ -502,6 +502,9 @@
     <Compile Include="zigbee\include\MAC\MAC_mlme_scan.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="zigbee\include\MAC\MAC_mlme_start.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="zigbee\include\MAC\MAC_NWK_binding.h">
       <SubType>compile</SubType>
     </Compile>
@@ -545,6 +548,9 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="zigbee\include\NWK\NWK_nlme.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="zigbee\include\NWK\NWK_nlme_join.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="zigbee\include\NWK\NWK_prototypes.h">

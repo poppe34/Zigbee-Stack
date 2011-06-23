@@ -10,16 +10,20 @@
 #include "MAC/mac_prototypes.h"
 #include "MAC/MAC_mlme.h"
 #include "MAC/MAC_mcps.h"
+
 #include "NWK/NWK_command.h"
+#include "NWK/NWK_nlme_join.h"
 
 nwk_join_t *join;
 typedef void (*nwk_joinHandler_t)(nwk_status_t status);
 nwk_joinHandler_t joinHandler;
 
+void NWK_beaconFilterControl(uint64_t PANid);
+
 uint64_t joinExtPANid;
 
-void NWK_nlme_joinReq(nwk_join_t *jn, void *cb){
-	joinHandler = (nwk_joinHandler_t *)cb;
+void NWK_nlme_joinReq(nwk_join_t *jn){
+
 	mlme_assoc_t *assoc = (mlme_assoc_t *)malloc(sizeof(mlme_assoc_t));
 	nwk_neigh_t *neighbor;
 	mac_scan_t *scan = (mac_scan_t *)malloc(sizeof(mac_scan_t));
@@ -133,6 +137,11 @@ void NWK_nlme_joinNetDiscov_cb(nwk_netDisc_t *netDisc){
 	nwk_neigh_t *parent;
 
 
+}
+
+void NWK_nlme_joinInd(nwk_nlme_joinInd_t *join)
+{
+	
 }
 
 void NWK_nlme_joinTx_cb(uint8_t num){

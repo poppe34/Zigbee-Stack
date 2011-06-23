@@ -650,7 +650,7 @@ void NWK_cmd_rejoinResp(short_addr_t addr, uint8_t status)
 	free(mpdu);
 }
 
-void NWK_cmd_linkStatus(void)
+void NWK_cmd_linkStatus(payload_t *pl)
 {
 	
 /***************************************
@@ -661,11 +661,9 @@ void NWK_cmd_linkStatus(void)
 *			Also I need to fix the dest IEEE if this is not a broadcast
 *
 ****************************************/
-	nwk_linkStatusCmd_t link;
-	
 	frame_t *fr = frame_new();
 	fr->payload = frame_hdr(payload);
-	fr->payload->ptr = fr->payload->pl;
+	fr->payload->ptr = pl;
 	
 	npdu_t *npdu =(npdu_t *)malloc(sizeof(npdu_t));
 	mpdu_t *mpdu = (mpdu_t *)malloc(sizeof(mpdu_t));
@@ -722,19 +720,12 @@ void NWK_cmd_linkStatus(void)
 *
 ****************************************/
 
-	link.count = 1;
-	link.first = 1;
-	link.last = 0;
-	link.reserved = 0;
+	//Reset the payload so we can put the CMD ID at the start of the payload
+	fr->payload->ptr = fr->payload->pl;
 	
 	SET_FRAME_DATA(fr->payload, NWK_LINK_STATUS, 1);
 
-	SET_FRAME_DATA(fr->payload, *((uint8_t *)&link), 1);
 
-// Add the Options to the payload
-	SET_FRAME_DATA(fr->payload, 0x2342, 2); //TODO I need to get info from the neighbor table
-	
-	SET_FRAME_DATA(fr->payload, 0x00, 1);
 //Create the NWK frame header
 	NWK_createFrame(npdu, fr);
 	//send off to the MAC data req

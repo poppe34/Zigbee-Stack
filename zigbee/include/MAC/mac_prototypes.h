@@ -13,16 +13,7 @@
 #include "mac/mac.h"
 #include "frame.h"
 
-mac_status_t mac_init(void);
-uint16_t get_short_ADDR(void);
-void get_PAN_ID(uint8_t *id);
-uint64_t get_IEEE_ADDR(void);
-void set_PAN_ID(uint8_t *pan_id);
-void set_short_ADDR(uint16_t addr);
-void set_IEEE_ADDR(uint64_t addr);
-uint8_t get_seqNum(void);
-Bool MAC_isAssoc(void);
-void MAC_setAssoc(Bool value);
+
 
 //MAC_beacon.c
 void MAC_beaconHandler(mpdu_t *mpdu, frame_t *fr);
@@ -54,16 +45,7 @@ mac_status_t MAC_waitACK(uint8_t num);
 
 
 //MAC.c
-mac_status_t mac_init(void);
-uint8_t get_MAC_seqNum(void);
-mac_pib_t *get_macPIB(void);
-void MAC_setPANid(uint16_t pan);
-void MAC_setShortAddr(uint16_t addr);
-void MAC_setCurrentChannel(uint8_t chan);
-void MAC_setLongAddr(uint64_t addr);
-void MAC_setCoordPANid(uint16_t pan);
-void MAC_setCoordShortAddr(uint16_t addr);
-void MAC_setCoordLongAddr(uint64_t addr);
+
 
 //temp
 void assoced(nwk_status_t status);

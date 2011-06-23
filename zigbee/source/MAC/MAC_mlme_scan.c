@@ -8,10 +8,13 @@
 
 #include <frame.h>
 
+#include "list.h"
+
 #include "MAC/mac_prototypes.h"
 #include "MAC/MAC_mlme.h"
 #include "MAC/MAC_command.h"
 #include "MAC/MAC_mlme_scan.h"
+#include "MAC/MAC_beacon.h"
 
 #include "alarms_task.h"
 
@@ -52,7 +55,7 @@ void MAC_mlme_scanReq(mac_scan_t *scan){
 
 	// Change the mode of the receiver to only receive beacons
 //	TODO:	I need to change add a function that changes the different modes for example: promisciuous, beacon only
-		change_receive_mode(yes);
+		//change_receive_mode(yes);
 
 		// Get the current PAN id store and then set the PAN id to 0xffff
 			old_PANid = mpib->macPANid;
@@ -105,7 +108,7 @@ void MAC_activeScan(mac_scan_t *scan){
 void end_active_scan(void)
 {
 	// Restore back to normal receive mode
-	change_receive_mode(NO);
+//	change_receive_mode(NO);
 	//	Restore the old PAN id
 	MAC_setPANid(old_PANid);
 	status = MAC_SUCCESS;
@@ -173,21 +176,27 @@ void MAC_mlme_scanSetCb(voidPtr cb)
 
 void MAC_mlme_scanSetDefaultCb(void)
 {
-	//TODO: I need to setup a default callback
+	scanHandler = NULL;	
 }
 void MAC_mlme_scanConfirm(void)
 {
-	list_t *scanResult = MAC_pandDescriptor_getList();
+	list_t *scanResult = MAC_panDescriptor_getList();
 	
 	mac_scanResult_t result;
 
-	result->desc 	= scanResult;
-	result->status 	= status;
-	result->type	= type;
+	result.descList	= scanResult;
+	result.status 	= status;
+	result.type		= type;
 
-
-	(scanHandler)(&result);
-	
+	if(scanHandler)
+	{
+		(scanHandler)(&result);
+	}
+	else
+	{
+		alarm_new(5, "Scan handler had a callback with no handler set");		
+	}
+	MAC_mlme_scanSetDefaultCb();	
 }
 
 

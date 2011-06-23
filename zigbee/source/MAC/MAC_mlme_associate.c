@@ -7,13 +7,16 @@
 #include "conf_zigbee.h"
 #include <frame.h>
 
+#include "MISC/qsm.h"
+#include "MISC/time.h"
+
 #include "MAC/MAC_mlme.h"
 #include "MAC/mac_prototypes.h"
 #include "MAC/MAC_command.h"
 #include "MAC/MAC.h"
 
-#include "MISC/qsm.h"
-#include "MISC/time.h"
+#include "NWK/NWK_nlme_join.h"
+
 #include "alarms_task.h"
 
 typedef void (*mac_assocHandler_t)(mac_status_t status);
@@ -157,4 +160,13 @@ void MAC_mlme_assocInd(long_addr_t *addr, mac_capibilities_t capib, security_t *
 	addr = addr;
 	capib = capib;
 	sec = sec;
+		
+	nwk_nlme_joinInd_t *jn = (nwk_nlme_joinInd_t *)malloc(sizeof(nwk_nlme_joinInd_t));
+	
+	jn->extAddr = addr;
+	jn->capib = capib;
+	jn->secureRejoin = NO;
+	jn->rejoin = 0x00;
+	
+	NWK_nlme_joinInd(jn);
 }

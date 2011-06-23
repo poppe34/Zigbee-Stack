@@ -123,13 +123,16 @@ mac_status_t mac_init(void) {
 
 //	TODO:	the following arguments need to be moved to a better location.
 	turn_ON_CRC();
+
+
+/*
+*	this below is temp and should be deleted in the future
+*/
 	if(ioport_pin_is_high(ZIGBEE_COORD_GPIO))
 	{
-		MAC_mlme_startReq();
+		
 		MAC_setLongAddr(0x0000222388894343);
-		MAC_setShortAddr(0x000);
-		panCoord = YES;
-		macPIB.macAssociatedPANCoord = YES;
+
 	}
 	else
 	{

@@ -9,18 +9,18 @@
 #include "alarms_task.h"
 
 #include "MAC/mac.h"
-#include "MAC/mac_prototypes.h"
 #include "MAC/MAC_beacon.h"
-#include "NWK/NWK_prototypes.h"
 #include "MAC/MAC_command.h"
 #include "MAC/MAC_mlme.h"
+
+void NWK_beacon_handler(mac_pan_descriptor_t *desc, mpdu_t *mpdu, frame_t *fr);
 
 LIST(panDescriptor);
 
 
 mac_beaconHandler_t handle;
 
-void MAC_beaconReq(void *cb)
+void MAC_beacon_setCB(void *cb)
 {
 	handle = (mac_beaconHandler_t *)cb;
 }
@@ -30,7 +30,7 @@ void MAC_panDescriptor_init(void)
 	list_init(panDescriptor);
 }
 
-list_t * MAC_pandDescriptor_getList(void)
+list_t * MAC_panDescriptor_getList(void)
 {
 	return panDescriptor;
 }
@@ -84,7 +84,7 @@ void MAC_beaconHandler(mpdu_t *mpdu, frame_t *fr)
 		
 	MAC_mlme_beaconInd(mpdu, fr);
 	
-	NWK_beaconInd(desc, mpdu, fr);
+	NWK_beacon_handler(desc, mpdu, fr);
 
 	if(mpib->macRuntimeStatus != MAC_SCAN_IN_PROGRESS)
 	{
@@ -97,7 +97,7 @@ void MAC_beaconHandler(mpdu_t *mpdu, frame_t *fr)
 
 void MAC_beacon(void)
 {
-	/*
+/*	
 	uint8_t tempSuperframe;
 
 	phy_pib_t *ppib = get_phyPIB();

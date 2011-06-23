@@ -21,14 +21,16 @@ typedef enum
 	nlme_ED_Scan = 0x04,
 }scan_request_t;
 
-typedef enum{
+typedef enum
+{
 	ED_SCAN = 0x00,
 	ACTIVE_SCAN = 0x01,
 	PASSIVE_SCAN = 0x02,
 	ORPHAN_SCAN = 0x03,
 }scan_type_t;
 
-typedef struct MAC_SCAN{
+typedef struct 
+{
 	scan_type_t		type;
 	scan_request_t	requestor;
 	uint32_t 		ScanChannels;

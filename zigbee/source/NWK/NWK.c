@@ -31,7 +31,7 @@
 /*================================= MACROS           =========================*/
 
 /*================================= VARIABLES        =========================*/
-nwk_nib_t nnib;
+static nwk_nib_t nnib;
 payload_t nwkBeacon;
 /*================================= SOURCE CODE      =========================*/
 void nwk_init(void){
@@ -96,7 +96,7 @@ nwk_nib_t *NWK_getNIB(void){
 }
 
 void NWK_setExtendedPANid(uint64_t addr){
-		nnib.nwkExtendedPANid = addr;
+	nnib.nwkExtendedPANid = addr;
 }
 
 void NWK_setShortAddr(uint16_t addr){

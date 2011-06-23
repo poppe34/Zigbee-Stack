@@ -17,7 +17,8 @@
 #include "MAC/mac.h"
 
 
-typedef enum COMMAND_TYPE{
+typedef enum
+{
 	MAC_ASSOC_REQUEST = 0x01,
 	MAC_ASSOC_RESPONCE = 0x02,
 	MAC_DISASSOC_NOTIFY = 0x03,

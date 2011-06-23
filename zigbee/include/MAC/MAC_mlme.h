@@ -48,7 +48,5 @@ void MAC_mlme_pollReq(addr_t *dstAddr);
 void MAC_mlme_pollReq_cb(mac_status_t status);
 void MAC_mlme_pollConf(mac_status_t status);
 
-//MLME Start
-mac_status_t MAC_mlme_startReq(void);
 
 #endif /* MAC_MLME_H_ */
