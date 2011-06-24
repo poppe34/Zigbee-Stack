@@ -109,3 +109,40 @@ void NWK_beaconFilterControl(uint64_t PANid){
 	}
 
 }
+
+void NWK_buildBeaconPayload(void){
+
+	payload_t *nwkBeacon = NWK_getBeaconPayload();
+	mac_pib_t *mpib = get_macPIB();
+	nwk_nib_t *nnib = NWK_getNIB();
+	
+	nwkBeacon->ptr = &nwkBeacon->pl;
+	nwkBeacon->length = 16;
+
+	//Byte - 1: Byte Protocol ID
+	*nwkBeacon->ptr++ = 0x00; //currently always 0x00 for zigbee protocols may change in the future
+	
+	//Byte - 2: Stack Profile and NWKcProtocolVersion
+	*nwkBeacon->ptr = (nnib->nwkStackProfile<<4);
+	*nwkBeacon->ptr++ |= nwkcProtocolVersion;
+
+	//Byte - 3: Router Capacity, device depth, end device capacity
+	*nwkBeacon->ptr = (0x00<<2);//TODO: currently I am telling things I am not at Router Capacity but I will need to update this once I have a variable
+	*nwkBeacon->ptr |= (0x01<<3);//TODO: currently I am telling thins I am at depth 1 but this needs to updated once I have a variable
+	*nwkBeacon->ptr++ |= (0x00<<7);//TODO: currently I am telling things I am not at end device capacity but I will need to update this once I have a variable
+
+	//Byte - 4 - 12: NWK extended PANid
+	
+	SET_FRAME_DATA(nwkBeacon, nnib->nwkExtendedPANid, 8);
+	
+	//Byte 13 - 15: TXOffset
+	*nwkBeacon->ptr++ = 0xff; //TODO: TX offset... I might make a constant for this since it is always 0xffffff for a beaconless network
+	*nwkBeacon->ptr++ = 0xff;
+	*nwkBeacon->ptr++= 0xff;
+
+	//Byte - 16: NWKUpdateId
+	*nwkBeacon->ptr = nnib->nwkUpdateId;
+	
+	mpib->macBeaconPayloadLength = 16;//nwkBeacon->length;
+	mpib->macBeaconPayload = nwkBeacon->pl;
+}

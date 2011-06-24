@@ -79,7 +79,7 @@ if(ioport_pin_is_high(ZIGBEE_COORD_GPIO))
 		nwk_nlme_nf_t nf;
 		nf.beaconOrder = 0xf;
 		nf.BatteryLifeExt = NO;
-		nf.scanChannels = 0x00000800;
+		nf.scanChannels = 0x00008000;
 		nf.scanDuration = 0x2;
 		nf.superframeOrder = 0xf;
 		NWK_nlme_formNetworkReq(&nf);

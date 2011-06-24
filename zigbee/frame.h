@@ -134,6 +134,13 @@ typedef struct
 
 typedef struct
 {
+	uint8_t pl[16];
+	uint8_t	*ptr;
+	uint8_t length;
+}beaconPayload_t;
+
+typedef struct
+{
 	uint8_t  frame[128];
 	uint8_t	 *ptr;
 	uint8_t  length;

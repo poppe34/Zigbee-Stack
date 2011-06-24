@@ -662,8 +662,8 @@ void NWK_cmd_linkStatus(payload_t *pl)
 *
 ****************************************/
 	frame_t *fr = frame_new();
-	fr->payload = frame_hdr(payload);
-	fr->payload->ptr = pl;
+	fr->payload = pl;
+	fr->payload->ptr = fr->payload->pl;
 	
 	npdu_t *npdu =(npdu_t *)malloc(sizeof(npdu_t));
 	mpdu_t *mpdu = (mpdu_t *)malloc(sizeof(mpdu_t));
@@ -725,7 +725,7 @@ void NWK_cmd_linkStatus(payload_t *pl)
 	
 	SET_FRAME_DATA(fr->payload, NWK_LINK_STATUS, 1);
 
-
+	fr->payload->ptr +=(fr->payload->length-1);
 //Create the NWK frame header
 	NWK_createFrame(npdu, fr);
 	//send off to the MAC data req

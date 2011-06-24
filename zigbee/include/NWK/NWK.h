@@ -325,7 +325,7 @@ void NWK_frame_construct(zig_frame_t);
 uint8_t get_NWK_Sequence_num(void);
 nwk_nib_t *NWK_getNIB(void);
 void NWK_setExtendedPANid(uint64_t addr);
-
+payload_t *NWK_getBeaconPayload(void);
 /*TODO:  I need to add the logic for responce to a data transmition
  * 	1. return INVAILD_REQUEST if I get this request when it is not accosiated.
  */

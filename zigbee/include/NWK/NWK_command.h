@@ -86,7 +86,7 @@ START_PACK
 typedef struct PACK
 {
 	COMBINE(4, (
-	uint8_t		count: 4,
+	uint8_t		count: 5,
 	uint8_t		first: 1,
 	uint8_t		last: 1,
 	uint8_t		reserved: 1))

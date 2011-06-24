@@ -443,7 +443,7 @@ void MAC_commandHandler(frame_t *fr, mpdu_t *mpdu)
 		break;
 		case MAC_BEACON_REQUEST:
 			alarm("Rx a Beacon Req");
-			MAC_mlme_beaconInd(mpdu, fr);
+			MAC_beacon();
 		break;
 		case MAC_COORD_REALIGN:
 		

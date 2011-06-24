@@ -219,9 +219,6 @@ mac_filter_t MAC_breakdownFrame(mpdu_t *mpdu, frame_t *fr){
     mpdu->fcf = *((mac_fcf_t *)(fr->Rx_fr->ptr));
     fr->Rx_fr->ptr += sizeof(mac_fcf_t);
     
-	//TODO: see if there is any way to set the mpdu->fcf equal to the frame so I won't have to break down the bits
-	uint16_t *temp = &mpdu->fcf;
-
 	mpdu->source.mode = mpdu->fcf.MAC_fcf_SrcAddr_Mode;
 	mpdu->destination.mode = mpdu->fcf.MAC_fcf_DstAddr_Mode;
 /***************************************
@@ -239,16 +236,12 @@ mac_filter_t MAC_breakdownFrame(mpdu_t *mpdu, frame_t *fr){
 	break;
 
 	case(MAC_SHORT_ADDRESS):
-		mpdu->destination.mode = MAC_SHORT_ADDRESS;
-
 		mpdu->destination.PANid = GET_FRAME_DATA(fr->Rx_fr, 2);
 
 		mpdu->destination.shortAddr = GET_FRAME_DATA(fr->Rx_fr, 2);
 			
 	break;
 	case(MAC_LONG_ADDRESS):
-		mpdu->destination.mode = MAC_LONG_ADDRESS;
-
 		mpdu->destination.PANid = GET_FRAME_DATA(fr->Rx_fr, 2);
 
 		mpdu->destination.extAddr = GET_FRAME_DATA(fr->Rx_fr, 8);
@@ -260,7 +253,7 @@ mac_filter_t MAC_breakdownFrame(mpdu_t *mpdu, frame_t *fr){
 	if(mpib->macPromiscuousMode == 0){
 		filtered = MAC_secondLevelFilter(mpdu);
 			if(filtered != NOT_FILTERED){
-			//	led_on_byte(filtered);
+			
 				return filtered;
 			}//end if
 		if(mpdu->fcf.MAC_fcf_Ack_Request && mpib->macAutoRequest){

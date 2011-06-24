@@ -60,7 +60,7 @@ void NWK_nlme_linkStatus(void)
 	if(is_Coord())
 	{
 		nwk_linkStatusCmd_t link, link2;
-		uint8_t count, count2;
+		uint8_t count = 0, count2 = 0;
 		nwk_neigh_t *currentTbl;
 		payload_t *pl = frame_hdr(payload);
 		
@@ -90,11 +90,13 @@ void NWK_nlme_linkStatus(void)
 		
 		link.count = count;
 		link.first = YES;
-		link.last = NO;
+		link.last = YES;
+		link.reserved = NO;
 		
 		link2.count = count2;
-		link.first = NO;
-		link.last = YES;
+		link2.first = YES;
+		link2.last = YES;
+		link2.reserved = NO;
 		
 		pl->ptr = &pl->pl[1];
 		SET_FRAME_DATA(pl, *((uint8_t *)&link), 1);

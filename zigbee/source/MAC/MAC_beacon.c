@@ -12,6 +12,7 @@
 #include "MAC/MAC_beacon.h"
 #include "MAC/MAC_command.h"
 #include "MAC/MAC_mlme.h"
+#include "MAC/mac_prototypes.h"
 
 void NWK_beacon_handler(mac_pan_descriptor_t *desc, mpdu_t *mpdu, frame_t *fr);
 
@@ -97,14 +98,17 @@ void MAC_beaconHandler(mpdu_t *mpdu, frame_t *fr)
 
 void MAC_beacon(void)
 {
-/*	
+	uint8_t *ptr;
 	uint8_t tempSuperframe;
-
+	mac_superframe_t superframe;
+	
 	phy_pib_t *ppib = get_phyPIB();
 	mac_pib_t *mpib = get_macPIB();
 
 	mpdu_t *mpdu = (mpdu_t *)malloc(sizeof(mpdu_t));
-	frame_t *fr = (frame_t *)malloc(sizeof(frame_t));
+	frame_t *fr = frame_new();
+
+	fr->payload = frame_hdr(payload);
 
 
 	mpdu->fcf.MAC_fcf_Frame_Type = MAC_BEACON;
@@ -118,52 +122,38 @@ void MAC_beacon(void)
 
 	mpdu->source = mpib->macShortAddress;
 
-//	Add room for CRC
-	*fr->ptr++ = 0x00;
-	*fr->ptr++ = 0x00;
-
-	fr->dataLength = 2;
-
-//	Add NWK Beacon Data
-
-	frame_data_t nwkBeacon;
-	nwkBeacon.ptr = mpib->macBeaconPayload;
-	nwkBeacon.length = mpib->macBeaconPayloadLength;
-
-	for(uint8_t x=0; x<nwkBeacon.length; x++)
-	{
-		*fr->ptr++ = *nwkBeacon.ptr++;
-		fr->dataLength++;
-	}//end for
 
 //	Add superframe
 
 	//GTS spec
-	*fr->ptr++ = 0x00;
-	*fr->ptr++ = 0x00;
-
-	fr->dataLength +=2;
+	SET_FRAME_DATA(fr->payload, 0x0000, 2);
 
 	//SuperFrame spec
-	tempSuperframe = ((mpib->macAssociationPermit) ? 0x80 : 0); //TODO: do a shift variable for the 0x80 like _bv(assoc_permit)
-	tempSuperframe |= ((mpib->macAssociatedPANCoord) ? 0x40 :0);
-	tempSuperframe |= ((mpib->macBattLifeExt) ? 0x10 : 0);
-	tempSuperframe |= 0x0f;// final CAP slot is not enabled in zigbee
+	superframe.assocPermit = ((mpib->macAssociationPermit) ? 1 : 0);
+	superframe.panCoord = ((mpib->macAssociatedPANCoord) ? 1 : 0);	
+	superframe.battLifeExt = ((mpib->macBattLifeExt) ? 1 : 0);
+	superframe.beaconOrder = 0x0f;
+	superframe.superframeOrder = 0x0f;
 
-	*fr->ptr++ = tempSuperframe;
+	SET_FRAME_DATA(fr->payload, *((uint16_t *)&superframe), 2);
 
-	tempSuperframe = 0xff; // Superframe Order and Beacon order are both 0xf since zigbee uses a beaconless network
+//	Add NWK Beacon Data
 
-	*fr->ptr++ = tempSuperframe;
+	if(	ptr = mpib->macBeaconPayload)
+	{
 
-	fr->dataLength += 2;
-
+		for(uint8_t x=0; x < (mpib->macBeaconPayloadLength); x++)
+		{
+			*fr->payload->ptr++ = *ptr++;
+		
+		}//end for
+		fr->payload->length += 16;
+	}	
 	MAC_createFrame(mpdu, fr);
 
     frame_sendWithFree(fr);
+	
 	free(mpdu);
-
-	*/
 }
 
 void MAC_beaconReq_cb(mac_status_t status)

@@ -370,13 +370,19 @@ typedef struct {
 	uint8_t mac_GTS_permit:1))
 }mac_gtsSpec_t;
 
-typedef struct MAC_SUPERFRAME{
-	uint8_t		superframeOrder;
-	uint8_t		beaconOrder;
-	uint8_t		capSlot;
-	uint8_t		assocPermit;
-	uint8_t		panCoord;
-	uint8_t		battLifeExt;
+typedef struct MAC_SUPERFRAME
+{
+	COMBINE(2, (
+	COMBINE(2, (
+	uint8_t		beaconOrder:4,
+	uint8_t		superframeOrder:4)),
+	COMBINE(5, (
+	uint8_t		capSlot:4,
+	Bool		battLifeExt:1,
+	Bool		reserved:1,
+	Bool		panCoord:1,
+	Bool		assocPermit:1))
+	))
 }mac_superframe_t;
 
 typedef struct PAN_DESCRIPTOR{
