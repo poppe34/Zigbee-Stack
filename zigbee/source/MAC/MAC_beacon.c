@@ -124,11 +124,6 @@ void MAC_beacon(void)
 
 
 //	Add superframe
-
-	//GTS spec
-	SET_FRAME_DATA(fr->payload, 0x0000, 2);
-
-	//SuperFrame spec
 	superframe.assocPermit = ((mpib->macAssociationPermit) ? 1 : 0);
 	superframe.panCoord = ((mpib->macAssociatedPANCoord) ? 1 : 0);	
 	superframe.battLifeExt = ((mpib->macBattLifeExt) ? 1 : 0);
@@ -136,6 +131,10 @@ void MAC_beacon(void)
 	superframe.superframeOrder = 0x0f;
 
 	SET_FRAME_DATA(fr->payload, *((uint16_t *)&superframe), 2);
+    
+//GTS spec
+	SET_FRAME_DATA(fr->payload, 0x0000, 2);
+
 
 //	Add NWK Beacon Data
 

@@ -100,7 +100,12 @@ void NWK_nlme_formNetworkActive_cb(mac_scanResult_t  *result)
 	nnib->nwkExtendedPANid = exPANid;
 	
 	MAC_setShortAddr(0x0000);
-	MAC_mlme_startReq(start);
+    
+    //Build the nwk Beacon Payload and add it to the MAC pib
+    NWK_buildBeaconPayload();
+	
+    MAC_mlme_startReq(start);
+
 	add_to_time_qsm(&NWK_nlme_linkStatus,NULL, ((nnib->nwkLinkStatusPeriod)*0x001E8480));
 }
 

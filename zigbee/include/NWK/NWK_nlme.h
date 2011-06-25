@@ -26,4 +26,10 @@ nwk_status_t NWK_nlme_formNetworkReq(nwk_nlme_nf_t *nf);
 void NWK_nlme_formNetworkED_cb(mac_scanResult_t* result);
 void NWK_nlme_formNetworkActive_cb(mac_scanResult_t  *result);
 void NWK_nlme_linkStatus(void);
+
+
+//BEACON.c
+void NWK_buildBeaconPayload(void);
+//I added this here because I don't know where else to put it yet
+
 #endif /* NWK_NLME_H_ */
