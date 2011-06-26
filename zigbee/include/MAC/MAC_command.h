@@ -15,7 +15,7 @@
 #include "MISC/security.h"
 
 #include "MAC/mac.h"
-
+#include "mac/MAC_mlme_assoc.h"
 
 typedef enum
 {
@@ -33,7 +33,7 @@ typedef enum
 /*================================= PROTOTYPES         =========================*/
 
 uint8_t MAC_assocRequestCommand(addr_t *destAddr, uint8_t capibilities, security_t *sec);
-uint8_t MAC_assocResponceCommand(mlme_assoc_t *assoc);
+void	MAC_assocResponceCommand(mac_assoc_resp_t *assoc);
 void MAC_disassocCommand(addr_t *destAddr, mac_disassoc_reason_t reason);
 uint8_t MAC_dataRequestCommand(addr_t *dstAddr);
 uint8_t MAC_panIDConflictCommand(void);

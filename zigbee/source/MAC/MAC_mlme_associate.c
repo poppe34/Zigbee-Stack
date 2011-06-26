@@ -6,7 +6,7 @@
  */
 #include "conf_zigbee.h"
 #include <frame.h>
-
+#include "list.h"
 #include "MISC/qsm.h"
 #include "MISC/time.h"
 
@@ -22,10 +22,17 @@
 typedef void (*mac_assocHandler_t)(mac_status_t status);
 mac_assocHandler_t assocHandler;
 
+LIST(joinAddrs);
+
 // This Is so I know what state we are in while performing the assoc Request
 static uint8_t waiting_for_AssocResponce = 0, waiting_for_info = 0;
 // This keeps what the pan Coord address is that we are attempting to Join
 static addr_t coordAddr;
+
+void MAC_mlme_assoc_init(void)
+{
+	list_init(joinAddrs);
+}
 
 void MAC_mlme_assocReq(addr_t *destAddr, uint32_t page, uint8_t channel, uint8_t capabilites, security_t *sec)
 {
@@ -113,6 +120,13 @@ void MAC_mlme_assocReqHandler(mpdu_t *mpdu, frame_t *fr)
 		MAC_mlme_assocInd(&mpdu->source.extAddr, capib, &mpdu->sec);
 	}		
 }
+void MAC_mlme_assocResp(mac_assoc_resp_t *resp)
+{
+		mac_assoc_data_t *data = (mac_assoc_data_t *)malloc(sizeof(mac_assoc_data_t));
+		data->resp = resp;
+		
+		list_add(joinAddrs, data);
+}
 
 void MAC_mlme_assocRespHandler(mpdu_t *mpdu, frame_t *fr)
 {
@@ -169,4 +183,30 @@ void MAC_mlme_assocInd(long_addr_t *addr, mac_capibilities_t capib, security_t *
 	jn->rejoin = 0x00;
 	
 	NWK_nlme_joinInd(jn);
+}
+
+Bool MAC_mlme_assocSendResp(uint64_t *addr)
+{
+	uint8_t count;
+	mac_assoc_data_t *assocData;
+	
+	if(count = list_length(joinAddrs))
+	{
+		assocData = list_head(joinAddrs);
+		
+		for(uint8_t x=0; x<count;x++)
+			{
+				if(*addr == assocData->resp->extAddr)
+				{
+					MAC_assocResponceCommand(assocData->resp);
+					return YES;
+				}
+				if((assocData = assocData->next) == NULL)
+				{
+					return NO;
+				}					
+			}
+	
+	}
+	return NO;
 }

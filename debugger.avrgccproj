@@ -499,6 +499,9 @@
     <Compile Include="zigbee\include\MAC\MAC_mlme.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="zigbee\include\MAC\MAC_mlme_assoc.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="zigbee\include\MAC\MAC_mlme_scan.h">
       <SubType>compile</SubType>
     </Compile>

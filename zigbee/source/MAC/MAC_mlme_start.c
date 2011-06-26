@@ -13,7 +13,7 @@
 
 #include "MAC/mac.h"
 #include "MAC/MAC_mlme_start.h"
-
+#include "MAC/MAC_mlme_assoc.h"
 
 
 MAC_mlme_start_CB_t startCBhandler;
@@ -46,7 +46,11 @@ void MAC_mlme_startReq(mac_mlme_start_t *start)
 
 	//Set the current Channel
 	MAC_setCurrentChannel(start->channel);
-
+	
+	if(start->PANcoord)
+	{
+		MAC_mlme_assoc_init();
+	}	
 	MAC_mlme_startConf(MAC_SUCCESS);
 }
 

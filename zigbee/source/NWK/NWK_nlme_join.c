@@ -18,6 +18,8 @@ nwk_join_t *join;
 typedef void (*nwk_joinHandler_t)(nwk_status_t status);
 nwk_joinHandler_t joinHandler;
 
+static Bool join_resp_waiting = NO;
+
 void NWK_beaconFilterControl(uint64_t PANid);
 
 uint64_t joinExtPANid;
@@ -144,6 +146,10 @@ void NWK_nlme_joinInd(nwk_nlme_joinInd_t *join)
 	
 }
 
+Bool MAC_mlme_joinResp_waiting(void)
+{
+    
+}
 void NWK_nlme_joinTx_cb(uint8_t num){
 
 }

@@ -78,7 +78,7 @@ uint8_t MAC_assocRequestCommand(addr_t *destAddr, uint8_t capibilities, security
  *           3. a device may send this command to the coordinator macResponseWaitTime symbols after the
  *               acknowledgment to an association request command.
  *------------------------------------------------------------------------------------------*/
-uint8_t MAC_assocResponceCommand(mlme_assoc_t *assoc)
+void MAC_assocResponceCommand(mac_assoc_resp_t *assoc)
 {
 //	Start a frame and get the PIB data needed to generate an assoc req.
 	frame_t *fr = frame_new();
@@ -88,30 +88,20 @@ uint8_t MAC_assocResponceCommand(mlme_assoc_t *assoc)
 
 	mac_pib_t *mpib = get_macPIB();
 
-// Setup the channel
-	MAC_setCurrentChannel(assoc->LogicalChannel);
-
 // Setup Coord address
-	mpdu->destination = assoc->Coord;
-
+	mpdu->destination.extAddr = assoc->extAddr;
+	mpdu->destination.mode = MAC_LONG_ADDRESS;
+	mpdu->destination.PANid = mpib->macPANid;
+	
 	mpdu->source = mpib->macLongAddress;
 
 //	TODO:	I need to add a function that place our PAN id the coord's after the ack. not before like below
-	MAC_setPANid(assoc->Coord.PANid);
-	MAC_setCoordPANid(assoc->Coord.PANid);
-
-	if(assoc->Coord.mode == SHORT_ADDRESS){
-		MAC_setCoordShortAddr(assoc->Coord.shortAddr);
-	}
-	else{
-		MAC_setCoordLongAddr(assoc->Coord.extAddr);
-	}
 
 
 	mpdu->fcf.MAC_fcf_Frame_Type = MAC_COMMAND;
-	mpdu->fcf.MAC_fcf_DstAddr_Mode = assoc->Coord.mode;
+	mpdu->fcf.MAC_fcf_DstAddr_Mode = MAC_LONG_ADDRESS;
 	mpdu->fcf.MAC_fcf_SrcAddr_Mode = MAC_LONG_ADDRESS;
-	mpdu->fcf.MAC_fcf_PANid_Compression = no;
+	mpdu->fcf.MAC_fcf_PANid_Compression = YES;
 	mpdu->fcf.MAC_fcf_Frame_Pending = no;
 	mpdu->fcf.MAC_fcf_Ack_Request = yes;
 	mpdu->fcf.MAC_fcf_Sec_enabled = no;
@@ -127,14 +117,16 @@ uint8_t MAC_assocResponceCommand(mlme_assoc_t *assoc)
 //1. get the MAC setup of the frame
 	MAC_createFrame(mpdu, fr);
 
-//2. device's capabilities
+//2. Setup Payload
 	//command type
 	SET_FRAME_DATA(fr->payload, MAC_ASSOC_RESPONCE, 1);
    
-    //capabilities info the command type 
-	SET_FRAME_DATA(fr->payload, assoc->CapabilityInfo, 1);
-    
+   //Device new Addr
+	SET_FRAME_DATA(fr->payload, assoc->shortAddr, 2);
 	
+    //status info the command type 
+	SET_FRAME_DATA(fr->payload, *((uint8_t *)&assoc->status), 1);
+  
 
 	frame_sendWithFree(fr);
     free(mpdu);
@@ -433,6 +425,11 @@ void MAC_commandHandler(frame_t *fr, mpdu_t *mpdu)
 		
 		case MAC_DATA_REQUEST:
 			alarm("Rx a Data Request command");
+            
+            if(MAC_mlme_assocSendResp(&mpdu->source.extAddr))
+            {
+                return;
+            }
 		break;
 		
 		case MAC_PAN_CONFLICT_NOTIFY:
