@@ -20,5 +20,6 @@ typedef struct
 
 
 void NWK_nlme_joinInd(nwk_nlme_joinInd_t *join);
+void NWK_nlme_joinReq(nwk_join_t *jn);
 
 #endif /* NWK_NLME_JOIN_H_ */

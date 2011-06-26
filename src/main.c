@@ -32,6 +32,7 @@
 #include "NWK/NWK_neighborTable.h"
 #include "NWK/NWK_nlme.h"
 #include "NWK/NWK_nlde.h"
+#include "NWK/NWK_nlme_join.h"
 
 
 void debug_test(void);
@@ -84,8 +85,27 @@ if(ioport_pin_is_high(ZIGBEE_COORD_GPIO))
 		nf.superframeOrder = 0xf;
 		NWK_nlme_formNetworkReq(&nf);
 
-	}	
-
+	}
+else{		
+	nwk_join_t join;
+	join.extedPANid = 0x0000222388894343;
+	join.capabilityInfo.altPanCoord = NO;
+	join.capabilityInfo.powerSource = 0;
+	join.capabilityInfo.devType = 0;
+	join.capabilityInfo.reserved2 = 0;
+	join.capabilityInfo.secEnabled = 0;
+	join.capabilityInfo.allocAddr = 0x01;
+	join.duration = 2;
+	join.scanChannels = 0x00000800;
+	join.securityEnabled = NO;
+	join.rejoinNetwork = JOINED_THRU_ASSOC;
+	
+	addr_t dest;
+	dest.shortAddr = 0x0000;
+	dest.PANid = 0x3ac6;
+	dest.mode = 0x02;
+	MAC_mlme_assocReq(&dest, DEFAULT_CHANNELPAGE, DEFAULT_CHANNEL, *((uint8_t *)&join.capabilityInfo), &sec);
+}
 
 	scheduler();
 	

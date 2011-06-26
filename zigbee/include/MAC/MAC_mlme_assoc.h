@@ -35,5 +35,5 @@ typedef struct ASSOC_DATA
 
 void MAC_mlme_assoc_init(void);
 Bool MAC_mlme_assocSendResp(uint64_t *addr);
-
+void MAC_mlme_assocResp_cb(phy_trac_t trac);
 #endif /* MAC_MLME_ASSOC_H_ */

@@ -7,6 +7,8 @@
 #include "conf_zigbee.h"
 #include <frame.h>
 #include "list.h"
+#include "alarms_task.h"
+
 #include "MISC/qsm.h"
 #include "MISC/time.h"
 
@@ -17,8 +19,6 @@
 
 #include "NWK/NWK_nlme_join.h"
 
-#include "alarms_task.h"
-
 typedef void (*mac_assocHandler_t)(mac_status_t status);
 mac_assocHandler_t assocHandler;
 
@@ -28,6 +28,7 @@ LIST(joinAddrs);
 static uint8_t waiting_for_AssocResponce = 0, waiting_for_info = 0;
 // This keeps what the pan Coord address is that we are attempting to Join
 static addr_t coordAddr;
+static mac_assoc_data_t *assocDataSent;
 
 void MAC_mlme_assoc_init(void)
 {
@@ -102,7 +103,30 @@ void MAC_mlme_assocReq_cb(phy_trac_t trac){
 	}
 	
 }
+void MAC_mlme_assocResp_cb(phy_trac_t trac)
+{
+	switch(trac){
+	case(TRAC_SUCCESS):
+		
+	break;
 
+	case(TRAC_NO_ACK):
+		
+	break;
+
+	case(TRAC_CHANNEL_ACCESS_FAILURE):
+		
+	break;
+
+	case(TRAC_INVALID):
+		
+	break;
+
+	case(TRAC_SUCCESS_DATA_PENDING):
+	
+	break;
+	}
+}
 void MAC_mlme_assocReqHandler(mpdu_t *mpdu, frame_t *fr)
 {
 	if(MAC_isPanCoord())
@@ -124,7 +148,7 @@ void MAC_mlme_assocResp(mac_assoc_resp_t *resp)
 {
 		mac_assoc_data_t *data = (mac_assoc_data_t *)malloc(sizeof(mac_assoc_data_t));
 		data->resp = resp;
-		
+		MAC_setTxCB(&MAC_mlme_assocResp_cb);
 		list_add(joinAddrs, data);
 }
 
@@ -199,6 +223,8 @@ Bool MAC_mlme_assocSendResp(uint64_t *addr)
 				if(*addr == assocData->resp->extAddr)
 				{
 					MAC_assocResponceCommand(assocData->resp);
+					assocDataSent = assocData->resp;
+					alarm_new(9, "Joined new device with addr: %.4x", assocData->resp->shortAddr);
 					return YES;
 				}
 				if((assocData = assocData->next) == NULL)
