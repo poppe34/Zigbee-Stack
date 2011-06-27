@@ -229,10 +229,11 @@ Bool MAC_mlme_assocSendResp(uint64_t *addr)
 				}
 				if((assocData = assocData->next) == NULL)
 				{
+					alarm("did not have the addr in the Assoc resp"); 
 					return NO;
 				}					
 			}
-	
+	alarm("did not have the addr in the Assoc resp"); 
 	}
 	return NO;
 }

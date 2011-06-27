@@ -413,6 +413,7 @@ void MAC_commandHandler(frame_t *fr, mpdu_t *mpdu)
 		switch(command) 
 		{
 		case(MAC_ASSOC_REQUEST):
+			alarm("Rx assoc Request");
             MAC_mlme_assocReqHandler(mpdu, fr);
 		break;
 		case(MAC_ASSOC_RESPONCE):
