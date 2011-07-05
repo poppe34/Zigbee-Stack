@@ -7,8 +7,7 @@
 #include "zigbee_task.h"
 
 
-
-void zigbee_SubtaskHandler(packet_t *pkt)
+keep_task_t zigbee_SubtaskHandler(packet_t *pkt)
 {
 	switch (pkt->subTask)
 	{
@@ -32,11 +31,19 @@ void zigbee_SubtaskHandler(packet_t *pkt)
 				
 				break;
 				case to_usb:
-				spi_sendToDev(pkt);
+				if(spi_ready())
+				{
+					spi_sendToDev(pkt);
+				}
+				else 
+				{
+					return retain_task;
+				}				
 				break;
 			}
 		break;
 	}
+	return release_task;
 }
 
 void zigbee_newPacket(uint8_t *buf, uint8_t zlen)

@@ -22,7 +22,7 @@ enum zigbeeSubtask
 	zigbeePacketQty = 0x01,
 	zigbeePacketFirst = 0x02,
 };
-void zigbee_SubtaskHandler(packet_t *pkt);
+keep_task_t zigbee_SubtaskHandler(packet_t *pkt);
 #ifdef DEBUG_SERVER
 
 void zigbee_task_init(void);

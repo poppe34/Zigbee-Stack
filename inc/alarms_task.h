@@ -48,7 +48,7 @@ void alarm_task(void);
 void alarm_free(alarm_t *alrm);
 void alarm_new(uint8_t lvl, char *str, ...);
 void alarm_sendQty(void);
-void alarm_subTaskHandler(packet_t *pkt);
+keep_task_t alarm_subTaskHandler(packet_t *pkt);
 void alarm_sendFirst(void);
 alarm_t *alarm_newAlrm(void);
 

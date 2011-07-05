@@ -29,18 +29,23 @@ typedef enum{
 	task_zigbee	= 0x03,
 }task_t;
 
+typedef enum{
+	retain_task = 0x01,
+	release_task = 0x02,
+}keep_task_t;
 
-typedef struct packet
+START_PACK
+typedef struct packet PACK
 {
 	struct packet       *next;
-	uint8_t             buf[64];
-	uint8_t             *ptr;
-	uint8_t               dir;
 	uint8_t             len;
 	uint8_t             task;
 	uint8_t             subTask;
+	uint8_t             buf[64];
+	uint8_t             *ptr;
+	uint8_t               dir;
 }packet_t;
-
+END_PACK
 
 void TM_task_init(void);
 void TM_task(void);

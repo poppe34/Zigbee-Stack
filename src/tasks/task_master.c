@@ -84,7 +84,10 @@ void TM_taskHandler(packet_t *pkt)
 		break;
 			
 		case task_alarm:
-			alarm_subTaskHandler(pkt);
+			if(alarm_subTaskHandler(pkt))
+			{
+				return;
+			}
 		break;
 		
 		case task_zigbee:

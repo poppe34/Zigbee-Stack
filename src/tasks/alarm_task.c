@@ -9,6 +9,7 @@
 #include "stdio.h"
 #include "stdarg.h"
 #include "task_master.h"
+#include "spi_task.h"
 
 /*********************************************************
 /*              Variable Declarations
@@ -72,6 +73,8 @@ void alarm_new(uint8_t lvl, char *str, ...)
 			
 			    pkt->buf[(pkt->len)] = 0;
 			    pkt->len++;
+				
+				pkt->len += 3;
 			}					
 		}					
 	    
@@ -81,7 +84,7 @@ void alarm_new(uint8_t lvl, char *str, ...)
 }
 
 
-void alarm_subTaskHandler(packet_t *pkt)
+keep_task_t alarm_subTaskHandler(packet_t *pkt)
 {
 	switch (pkt->subTask)
 	{
@@ -115,7 +118,14 @@ void alarm_subTaskHandler(packet_t *pkt)
 				case from_usb:
 				break;
 				case to_usb:
-				 spi_sendToDev(pkt);
+				 if(spi_ready())
+				 {
+					spi_sendToDev(pkt);
+				 }
+				 else
+				 {
+					 return retain_task;
+				 }				
 				break;
 			}			
 		break;
@@ -127,6 +137,7 @@ void alarm_subTaskHandler(packet_t *pkt)
 		break;
 	}
 
+	return release_task;
 }
 
 

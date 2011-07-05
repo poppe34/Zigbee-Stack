@@ -7,6 +7,7 @@
 
 #include "compiler.h"
 #include "avr/io.h"
+#include "frame.h"
 #include "conf_spi_master.h"
 #include "spi_master.h"
 #include "spi_task.h"
@@ -16,8 +17,9 @@
 #include "util/delay.h"
 #include "zigbee_task.h"
 
-
-
+static direction_t currentSPIpacketDir;
+static packet_t *currentSPIpacket;
+static spiReady;
 
 struct spi_device SPI_DEVICE_USB = {
 	//! Board specific select id
@@ -40,7 +42,8 @@ void spi_task_init(void)
 	
 	/* THIS IS JUST FOR TESTING-DEBUGGING */
 
-
+	((SPI_t *)SPI_USB)->INTCTRL |= SPI_INTLVL0_bm;
+	spiReady = YES;
 //	return YES;
 }
 
@@ -72,17 +75,15 @@ void spi_sendToDev(packet_t *pkt)
 	if(pkt)
 	{
         spi_select_device(SPI_USB, &SPI_DEVICE_USB);
+		spiReady = NO;
+		currentSPIpacket = pkt;
+		currentSPIpacketDir = OUTGOING;
+		pkt->len += 3;
+		pkt->ptr = &pkt->len;
+
+
+		//Tell the other device to setup to receive a packet by sending it a 0xAA
 		SPIC.DATA = flag;
-		while(!spi_is_rx_full(SPI_USB));
-
-	    spi_write_packet(SPI_USB, &(pkt->len), 1);
-
-	    spi_write_packet(SPI_USB, &(pkt->task), 1);
-
-	    spi_write_packet(SPI_USB, &(pkt->subTask), 1);
-
-	    spi_write_packet(SPI_USB, pkt->buf, pkt->len);
-	    spi_deselect_device(SPI_USB, &SPI_DEVICE_USB);
 	}
 	else
 	{
@@ -95,6 +96,7 @@ void spi_sendToDev(packet_t *pkt)
 void spi_polled(void)
 {
 	cli();
+	SPIC.INTCTRL = 0;
 	uint8_t display = 0x88;
 	packet_t *packet = TM_newPacket();
 	if(!(packet)) 
@@ -135,7 +137,7 @@ void spi_polled(void)
 
 	packet->dir = from_device;
 	spi_deselect_device(SPI_USB, &SPI_DEVICE_USB);
-
+	((SPI_t *)SPI_USB)->INTCTRL |= SPI_INTLVL0_bm;
 }
 
 void spi_IRQ_CB(void)
@@ -144,11 +146,30 @@ void spi_IRQ_CB(void)
 		spi_polled();
 }
 
+Bool spi_ready(void)
+{
+	return spiReady;
+}
 
 ISR(PORTC_INT0_vect)
 {
 	spi_IRQ_CB();
 }
 
-
+ISR(SPIC_INT_vect)
+{
+	if(currentSPIpacket->len)
+	{
+		((SPI_t *)SPI_USB)->DATA = *currentSPIpacket->ptr;
+	
+		currentSPIpacket->ptr++;
+		currentSPIpacket->len--;
+	}
+	
+	else 
+	{
+		spi_deselect_device(SPI_USB, &SPI_DEVICE_USB);
+		spiReady = YES;
+	}	
+}
 
