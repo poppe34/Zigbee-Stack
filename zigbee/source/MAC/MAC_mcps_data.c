@@ -85,7 +85,7 @@ void MAC_mcps_dataReq_cb(phy_trac_t status)
 }
 void MAC_mcps_dataConf(mac_status_t status)
 {
-	alarm_new(9, "Rx a data Confirm with status: %x", status);	
+	ASSERTalmInt(status, 9, "Rx a data Confirm with status: %x", status);	
 }
 
 

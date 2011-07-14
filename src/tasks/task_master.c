@@ -25,12 +25,12 @@ void TM_task(void)
 {
 	uint8_t length;
 	
-	packet_t *pkt;
+	packet_t *pkt = NULL;
 	
 	length = list_length(packets);
     if(length)
 	{
-        pkt = list_pop(packets);
+        pkt = list_head(packets);
 		TM_taskHandler(pkt);
 	}	
 	
@@ -48,7 +48,7 @@ void TM_removeTask(packet_t *pkt)
 {
 	list_remove(packets, pkt);
 }
-packet_t *TM_newPacket(void)
+packet_t *TM_newPacket(Bool addPacketToList)
 
 {
 	if(list_length(packets) >= 30)
@@ -60,8 +60,14 @@ packet_t *TM_newPacket(void)
 	
 	newPacket->ptr = newPacket->buf;
 	
-	list_add(packets, newPacket);
+	newPacket->len = 0;
+	newPacket->task = 0;
+	newPacket->subTask = 0;
 	
+	if(addPacketToList)
+	{
+		list_add(packets, newPacket);
+	}	
 	return newPacket;
 }
 
@@ -84,14 +90,17 @@ void TM_taskHandler(packet_t *pkt)
 		break;
 			
 		case task_alarm:
-			if(alarm_subTaskHandler(pkt))
+			if((alarm_subTaskHandler(pkt)) == retain_task)
 			{
 				return;
 			}
 		break;
 		
 		case task_zigbee:
-			zigbee_SubtaskHandler(pkt);
+			if((zigbee_SubtaskHandler(pkt)) == retain_task)
+			{
+				return;
+			}
 		break;
 		default:
 		    alarm("TASK MASTER REACHED AN UNKNOWN TASK");

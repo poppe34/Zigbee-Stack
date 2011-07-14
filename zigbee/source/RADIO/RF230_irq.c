@@ -85,7 +85,8 @@ void PHY_TxIrqCB(uint8_t irq_status){
 	if(((irq_status>> TRX_END) & 0x01)){
 		trac =(phy_trac_t)RF230BitRead(SR_TRAC_STATUS);
 		
-		alarm_new(5, "TRAC STATUS is:%x", trac);
+		ASSERTalmInt(trac, 5, "TRAC STATUS is:%x", trac);
+		
 		switch(trac){
 		case(TRAC_SUCCESS):
 			status = MAC_SUCCESS;

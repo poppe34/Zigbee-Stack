@@ -50,7 +50,7 @@ END_PACK
 void TM_task_init(void);
 void TM_task(void);
 void TM_addTask(packet_t *pkt);
-packet_t *TM_newPacket(void);
+packet_t *TM_newPacket(Bool addPacketToList);
 void TM_freePacket(packet_t *pkt);
 void TM_taskHandler(packet_t *pkt);
 void TM_removeTask(packet_t *pkt);

@@ -20,6 +20,7 @@
 static direction_t currentSPIpacketDir;
 static packet_t *currentSPIpacket;
 static spiReady;
+static volatile uint8_t packetLength;
 
 struct spi_device SPI_DEVICE_USB = {
 	//! Board specific select id
@@ -69,32 +70,50 @@ uint8_t char_stringLength(char *inx)
 
 void spi_sendToDev(packet_t *pkt)
 {
-	//cli();
-	uint8_t len;
-	uint8_t flag = 0xAA;
-	if(pkt)
+	if(pkt && spiReady && (pkt->len != 0))
 	{
-        spi_select_device(SPI_USB, &SPI_DEVICE_USB);
+		cli();
+		//set the spi interface as busy
 		spiReady = NO;
-		currentSPIpacket = pkt;
+		
+		TM_removeTask(pkt);
+		
+		//set the spi direction as outgoing
 		currentSPIpacketDir = OUTGOING;
-		pkt->len += 3;
-		pkt->ptr = &pkt->len;
-
-
-		//Tell the other device to setup to receive a packet by sending it a 0xAA
-		SPIC.DATA = flag;
+		
+		/*
+		set the pointers to the beginning of the frame. 
+		Order of the Frame:
+			1. length
+			2. task
+			3. subTask
+			4. Data to be sent
+			*/		
+		currentSPIpacket = pkt;
+		
+		//Set the packet length
+		packetLength = currentSPIpacket->len;
+		
+		//reset the pointer to the front of the Packet
+		currentSPIpacket->ptr = &currentSPIpacket->len;
+		sei();
+		
+		// Select the USB Device
+		spi_select_device(SPI_USB, &SPI_DEVICE_USB);
+	//Tell the other device to setup to receive a packet by sending it a 0xAA
+		SPIC.DATA = 0xAA;
 	}
 	else
 	{
-		LED_On(LED6_GPIO);
-	}		
-	sei();
+		while(1);
+		
+	}	
 }
 
 
 void spi_polled(void)
 {
+	/*
 	cli();
 	SPIC.INTCTRL = 0;
 	uint8_t display = 0x88;
@@ -120,8 +139,6 @@ void spi_polled(void)
 	{	
         spi_deselect_device(SPI_USB, &SPI_DEVICE_USB);
 		sei();
-//		alarm_new(5, "Received a SPI Packet with no Length");
-		LED_Toggle(LED4_GPIO);
 		TM_freePacket(packet);
 		return;
 
@@ -138,6 +155,7 @@ void spi_polled(void)
 	packet->dir = from_device;
 	spi_deselect_device(SPI_USB, &SPI_DEVICE_USB);
 	((SPI_t *)SPI_USB)->INTCTRL |= SPI_INTLVL0_bm;
+	*/
 }
 
 void spi_IRQ_CB(void)
@@ -148,28 +166,33 @@ void spi_IRQ_CB(void)
 
 Bool spi_ready(void)
 {
+	
 	return spiReady;
+	
 }
 
 ISR(PORTC_INT0_vect)
 {
-	spi_IRQ_CB();
+	
 }
 
 ISR(SPIC_INT_vect)
 {
-	if(currentSPIpacket->len)
+	if(currentSPIpacket)
 	{
-		((SPI_t *)SPI_USB)->DATA = *currentSPIpacket->ptr;
+		if(packetLength)
+		{
+			((SPI_t *)SPI_USB)->DATA = *currentSPIpacket->ptr++;
+			packetLength--;
+		}
 	
-		currentSPIpacket->ptr++;
-		currentSPIpacket->len--;
-	}
-	
-	else 
-	{
-		spi_deselect_device(SPI_USB, &SPI_DEVICE_USB);
-		spiReady = YES;
-	}	
+		else 
+		{
+			spi_deselect_device(SPI_USB, &SPI_DEVICE_USB);
+			free(currentSPIpacket);
+			currentSPIpacket = NULL;
+			spiReady = YES;
+		}	
+	}		
 }
 

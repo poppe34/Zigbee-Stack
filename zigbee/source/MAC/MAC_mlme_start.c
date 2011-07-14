@@ -63,7 +63,7 @@ void MAC_mlme_startConf(mac_status_t status)
 	}
 	else
 	{
-		alarm("Recieved MAC start Confirm without setting the CB");
+//		alarm("Recieved MAC start Confirm without setting the CB");
 	}		
 	
 }

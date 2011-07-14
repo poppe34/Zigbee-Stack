@@ -2,7 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
   <PropertyGroup>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectVersion>1.0</ProjectVersion>
+    <ProjectVersion>5.0</ProjectVersion>
     <ProjectGuid>{532e9a3e-7d2b-4ed8-91dd-13c662367a0d}</ProjectGuid>
     <avrdevice>ATxmega128A1</avrdevice>
     <avrdeviceseries>xmegaa</avrdeviceseries>
@@ -71,6 +71,11 @@
         <InterfaceName>JTAG</InterfaceName>
       </ToolOptions>
     </com_atmel_avrdbg_tool_jtagicemk3>
+    <Language>C</Language>
+    <UseGlobalToolchain>True</UseGlobalToolchain>
+    <GlobalToolchainPath>C:\Program Files (x86)\Atmel\AVR Studio 5.0\AVR ToolChain\bin</GlobalToolchainPath>
+    <ToolchainDirPath />
+    <MakeDirPath />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ToolchainSettings>

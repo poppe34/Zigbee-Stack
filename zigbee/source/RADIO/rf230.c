@@ -48,7 +48,6 @@ void rf230_init(void)
     
 	turn_ON_CRC();
 
-	alarm_new(9, "CRC Started \0");
 	
     
 }

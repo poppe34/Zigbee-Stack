@@ -34,6 +34,7 @@ keep_task_t zigbee_SubtaskHandler(packet_t *pkt)
 				if(spi_ready())
 				{
 					spi_sendToDev(pkt);
+					return retain_task;
 				}
 				else 
 				{
@@ -48,7 +49,7 @@ keep_task_t zigbee_SubtaskHandler(packet_t *pkt)
 
 void zigbee_newPacket(uint8_t *buf, uint8_t zlen)
 {
-	packet_t *pkt = TM_newPacket();
+	packet_t *pkt = TM_newPacket(YES);
 	
 	pkt->len = zlen;
 	pkt->ptr = (pkt->buf);

@@ -21,6 +21,8 @@
 
 #define VERBOSE_LEVEL   10
 #define alarm(str)  alarm_new(5, str)
+#define ASSERTalm(variable, lvl, str) if(variable){alarm_new(lvl, str);}
+#define ASSERTalmInt(variable, lvl, str, var) if(variable){alarm_new(lvl, str, var);}
 /********************************************************************************
 /*          TYPEDEFS
 ********************************************************************************/

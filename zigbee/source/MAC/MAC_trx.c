@@ -430,6 +430,7 @@ void MAC_txStatus(phy_trac_t trac){
 	if(trx_cb)
 	{
 		(trx_cb)(trac);
+		trx_cb = NULL;
 	}
 	else
 	{

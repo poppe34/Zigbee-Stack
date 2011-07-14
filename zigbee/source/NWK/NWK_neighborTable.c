@@ -7,6 +7,8 @@
 
 #include <frame.h>
 
+#include "alarms_task.h"
+
 #include "list.h"
 #include "MISC/qsm.h"
 
@@ -18,31 +20,37 @@
 
 
 
+
 LIST(neighbor_table);
 
-void NWK_neighborTableInit(void){
-list_init(neighbor_table);
+static uint8_t neighbor_count;
+
+void NWK_neighborTableInit(void)
+{
+	list_init(neighbor_table);
+	neighbor_count = 0;
 }
 
 
-nwk_neigh_t *NWK_getBestAddrForNetwork(uint64_t extendPANid){
+nwk_neigh_t *NWK_getBestAddrForNetwork(uint64_t extendPANid)
+{
 	uint8_t x, lqi= 0x00;
 	nwk_neigh_t *current, *best;
 	current = (nwk_neigh_t *)(list_head(neighbor_table));
 
-	for(x=0; x<(list_length(neighbor_table)); x++){
-
-		if(extendPANid == current->extendPANid){
-
+	for(x=0; x<(list_length(neighbor_table)); x++)
+	{
+		if(extendPANid == current->extendPANid)
+		{
 				best = current;
-
 		}//end if
 		current = current->next;
 	}//end for
 	return best;
 }
 
-list_t NWK_getNeighTable(void){
+list_t NWK_getNeighTable(void)
+{
 	return neighbor_table;
 }
 /*
@@ -54,6 +62,40 @@ uint8_t NWK_getNeighTableCount(void){
 	return table->count;
 }
 */
+
+nwk_neigh_t *NWK_nlme_neighborTableSearchShortAddr(uint16_t addr)
+{
+	nwk_neigh_t *currentNeighbor;
+	
+	currentNeighbor = list_head(neighbor_table);
+	
+	while(currentNeighbor)
+	{
+		if(currentNeighbor->shortAddr.shortAddr == addr)
+		{
+			return currentNeighbor;
+		}
+		else
+		{
+			currentNeighbor = currentNeighbor->next;
+		}
+	}
+	return NULL;									
+}
+
+nwk_neigh_t *NWK_nlme_addNeighbor(void)
+{
+	nwk_neigh_t *newNeigh = (nwk_neigh_t *)malloc(sizeof(nwk_neigh_t));
+	
+	if(newNeigh)
+	{
+		list_add(neighbor_table, newNeigh);
+		neighbor_count++;
+	}
+		
+	return newNeigh;
+}
+
 
 void NWK_nlme_linkStatus(void)
 {
@@ -107,4 +149,5 @@ void NWK_nlme_linkStatus(void)
 		
 		add_to_time_qsm(&NWK_nlme_linkStatus, NULL, ((nnib->nwkLinkStatusPeriod)*0x001E8480));
 	}	
+	alarm_new(12, "NWK Layer sent Link Status");
 }
