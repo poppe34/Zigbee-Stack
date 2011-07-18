@@ -151,3 +151,8 @@ void NWK_nlme_linkStatus(void)
 	}	
 	alarm_new(12, "NWK Layer sent Link Status");
 }
+
+void NWK_linkStatusHandler(void){
+
+
+}	

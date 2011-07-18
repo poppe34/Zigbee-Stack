@@ -32,27 +32,10 @@ void NWK_nlme_joinReq(nwk_join_t *jn){
 
 	switch(jn->rejoinNetwork){
 	case(JOINED_THRU_ASSOC):
-
-		neighbor = NWK_getBestAddrForNetwork(jn->extedPANid);
-
-		assoc->LogicalChannel = neighbor->logicalChannel;
-		assoc->Coord = neighbor->shortAddr;
-
-		//MAC_mlme_assocReq(assoc);
-
-		free(assoc);
 	break;
 	case(JOINED_DIRECTLY):
 	break;
 	case(JOINED_NWK_REJOIN):
-		scan->ScanChannels = jn->scanChannels;
-		scan->ScanDuration = jn->duration;
-		scan->type = ACTIVE_SCAN;
-
-		//TODO: add the logic to do a MAC scan of the channels given in jn
-		joinExtPANid = jn->extedPANid;
-		NWK_beaconFilterControl(joinExtPANid);
-		MAC_mlme_scanReq(scan);
 	break;
 	}//end switch
 //TODO:	add the logic if the network is already joined to issue an indication saying INVALID_REQUEST
@@ -143,7 +126,11 @@ void NWK_nlme_joinNetDiscov_cb(nwk_netDisc_t *netDisc){
 
 void NWK_nlme_joinInd(nwk_nlme_joinInd_t *join)
 {
+	nwk_neigh_t *newNeigh = NWK_nlme_addNeighbor();
 	
+	if(newNeigh)
+	{
+		newNeigh->
 }
 
 Bool MAC_mlme_joinResp_waiting(void)
